@@ -1,0 +1,25 @@
+To: CLIM195@e.ntu.edu.sg
+Subject: Blume Order Acknowledgement - #10
+Body: Thank you LIM CHONG TEE. Your order #10 has been received. Total: $95.
+
+Subject: Order Finalized
+Body: Order #10 finalized. Design changes noted: 
+
+To: CLIM195@e.ntu.edu.sg
+Subject: Blume Order Acknowledgement - #13
+Body: Thank you LIM CHONG YAO. Your order #13 has been received. Total: $95.
+
+Subject: Order Finalized
+Body: Order #13 finalized. Design changes noted: 
+
+To: CLIM195@e.ntu.edu.s
+Subject: Blume Order Acknowledgement - #14
+Body: Thank you LIM CHONG TEE. Your order #14 has been received. Total: $265.
+
+To: CLIM195@e.ntu.edu.sg
+Subject: Blume Order Acknowledgement - #15
+Body: Thank you LIM CHONG YAO. Your order #15 has been received. Total: $55.
+
+Subject: Order Finalized
+Body: Order #15 finalized. Design changes noted: 
+

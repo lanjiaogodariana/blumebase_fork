@@ -1,9 +1,13 @@
 <?php 
+// check if session is none, then start session
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+// initialize cart item count accumulator
 $cart_count = 0;
+// check if session cart exists and is not empty
 if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
+    // loop through cart items to sum total quantities
     foreach ($_SESSION['cart'] as $item) {
         $cart_count += $item['quantity'];
     }
@@ -18,19 +22,23 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
     <div class="blume-cart-inner">
         <div class="blume-cart-header">
             <h2 class="serif-font" style="font-size: 20px; margin: 0;">Your Cart</h2>
+            <!-- close cart drawer button -->
             <button id="closeCart" style="font-size: 20px; background: none; border: none; cursor: pointer;">✕</button>
         </div>
         
         <div class="blume-cart-items">
+            <!-- check if cart session is empty -->
             <?php if (empty($_SESSION['cart'])): ?>
                 <div style="text-align: center; color: #6b7280; margin-top: 40px;">
                     <p style="font-size: 18px; margin-bottom: 16px;">Your cart is empty</p>
+                    <!-- prompt login if user name session is not set -->
                     <?php if(!isset($_SESSION['user_name'])): ?>
                         <p style="font-size: 14px;">Have an account? <a href="login.php" style="text-decoration: underline; color: black;">Log in</a> to check out faster.</p>
                     <?php endif; ?>
                 </div>
             <?php else: ?>
                 <?php 
+                // initialize cart total accumulator
                 $cart_total = 0;
                 // We use $index here to track the exact row in the array
                 foreach ($_SESSION['cart'] as $index => $item): 
@@ -38,6 +46,7 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
                     $cart_total += $item_total;
                 ?>
                     <div class="blume-cart-item">
+                        <!-- display product image if available, else placeholder -->
                         <?php if(!empty($item['image'])): ?>
                             <img src="<?php echo htmlspecialchars($item['image']); ?>" alt="Product">
                         <?php else: ?>
@@ -56,6 +65,7 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
                                 
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
                                     <div style="display: flex; align-items: center; border: 1px solid #d1d5db;">
+                                        <!-- decrease item quantity form -->
                                         <form action="cart_action.php" method="POST" style="margin:0;">
                                             <input type="hidden" name="action" value="decrease">
                                             <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
@@ -63,6 +73,7 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
                                             <button type="submit" style="padding: 4px 8px; cursor: pointer; background: none; border: none;">-</button>
                                         </form>
                                         <span style="padding: 4px 12px; font-size: 12px; border-left: 1px solid #d1d5db; border-right: 1px solid #d1d5db;"><?php echo $item['quantity']; ?></span>
+                                        <!-- increase item quantity form -->
                                         <form action="cart_action.php" method="POST" style="margin:0;">
                                             <input type="hidden" name="action" value="increase">
                                             <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
@@ -70,6 +81,7 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
                                             <button type="submit" style="padding: 4px 8px; cursor: pointer; background: none; border: none;">+</button>
                                         </form>
                                     </div>
+                                    <!-- remove item form -->
                                     <form action="cart_action.php" method="POST" style="margin:0;">
                                         <input type="hidden" name="action" value="remove">
                                         <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
@@ -86,6 +98,7 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
         </div>
 
         <div class="blume-cart-footer">
+            <!-- check if cart is not empty to display subtotal and checkout button -->
             <?php if (!empty($_SESSION['cart'])): ?>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 14px; font-weight: bold; letter-spacing: 0.1em;">
                     <span>SUBTOTAL</span>
@@ -93,6 +106,7 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
                 </div>
                 <a href="checkout.php" class="btn-primary" style="display: block; text-decoration: none;">CHECKOUT</a>
             <?php else: ?>
+                <!-- continue shopping button if cart is empty -->
                 <button class="btn-primary" onclick="document.getElementById('closeCart').click()">CONTINUE SHOPPING</button>
             <?php endif; ?>
         </div>
@@ -111,31 +125,37 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
     </div>
 
     <div class="blume-nav-right">
+        <!-- check if user is logged in to show greeting or account link -->
         <?php if(isset($_SESSION['user_name'])): ?>
             <span>HI, <?php echo strtoupper(htmlspecialchars($_SESSION['user_name'])); ?></span>
             <a href="logout.php">LOGOUT</a>
         <?php else: ?>
             <a href="login.php">ACCOUNT</a>
         <?php endif; ?>
+        <!-- open cart button with item count badge -->
         <button id="openCart">CART (<?php echo $cart_count; ?>)</button>
     </div>
 </nav>
 
 <script>
+    // wait for dom content loaded to bind cart drawer open/close events
     document.addEventListener("DOMContentLoaded", function() {
         const cartDrawer = document.getElementById('cartDrawer');
         const cartOverlay = document.getElementById('cartOverlay');
         
+        // open cart drawer on click
         document.getElementById('openCart').addEventListener('click', () => {
             cartDrawer.classList.add('open');
             cartOverlay.classList.add('open');
         });
 
+        // close cart drawer on click
         document.getElementById('closeCart').addEventListener('click', () => {
             cartDrawer.classList.remove('open');
             cartOverlay.classList.remove('open');
         });
 
+        // close cart drawer when clicking overlay background
         cartOverlay.addEventListener('click', () => {
             cartDrawer.classList.remove('open');
             cartOverlay.classList.remove('open');
@@ -143,6 +163,7 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
     });
 </script>
 
+<!-- check if keep_cart_open session flag is set to keep cart drawer open after action -->
 <?php if (isset($_SESSION['keep_cart_open']) && $_SESSION['keep_cart_open']): ?>
     <script>
         document.addEventListener("DOMContentLoaded", function() {

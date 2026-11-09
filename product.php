@@ -1,25 +1,31 @@
 <?php
+// start session to manage state and cart
 session_start();
+
+// include db connection
 require_once 'includes/db.php';
 
 // Get the product ID from the URL
 $product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
+// redirect to shop if product id is invalid (0)
 if ($product_id === 0) {
     header("Location: shop.php");
     exit;
 }
 
-// Fetch the product from the database
+// Fetch the product from the database using prepared statement
 $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
 $stmt->execute([$product_id]);
 $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// redirect to shop if product does not exist in db
 if (!$product) {
     header("Location: shop.php");
     exit;
 }
 
+// tell navbar to use solid white background
 $use_solid_nav = true;
 ?>
 <!DOCTYPE html>
@@ -30,6 +36,7 @@ $use_solid_nav = true;
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="page-with-nav">
+    <!-- include navbar -->
     <?php include 'includes/navbar.php'; ?>
 
     <main class="blume-container">
@@ -37,10 +44,13 @@ $use_solid_nav = true;
             
             <!-- Left Side: Product Images -->
             <div class="blume-gallery">
+                <!-- primary product image -->
                 <img src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                <!-- render secondary image if available -->
                 <?php if (!empty($product['image_url_2'])): ?>
                     <img src="<?php echo htmlspecialchars($product['image_url_2']); ?>" alt="Alternate View">
                 <?php endif; ?>
+                <!-- render tertiary image if available -->
                 <?php if (!empty($product['image_url_3'])): ?>
                     <img src="<?php echo htmlspecialchars($product['image_url_3']); ?>" alt="Detail View">
                 <?php endif; ?>
@@ -52,10 +62,13 @@ $use_solid_nav = true;
                 <div class="blume-price">$<?php echo number_format($product['price'], 2); ?></div>
                 
                 <div class="blume-description">
+                    <!-- convert newlines to line breaks for description text -->
                     <?php echo nl2br(htmlspecialchars($product['description'])); ?>
                 </div>
 
+                <!-- add to cart form submits via post to cart_action.php -->
                 <form action="cart_action.php" method="POST" style="margin-bottom: 32px; border-top: 1px solid #eaeaea; padding-top: 24px;">
+                    <!-- hidden inputs for product id and action type -->
                     <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
                     <input type="hidden" name="action" value="add">
                     
@@ -104,7 +117,9 @@ $use_solid_nav = true;
                     </div>
 
                     <div style="display: flex; gap: 16px;">
+                        <!-- quantity input field -->
                         <input type="number" name="quantity" value="1" min="1" style="width: 80px; padding: 12px; border: 1px solid #ccc; text-align: center; font-size: 14px;">
+                        <!-- submit button to add item to cart -->
                         <button type="submit" class="btn-primary" style="margin-top: 0; flex-grow: 1;">ADD TO CART</button>
                     </div>
                 </form>
@@ -118,6 +133,7 @@ $use_solid_nav = true;
         </div>
     </main>
 
+    <!-- include footer -->
     <?php include 'includes/footer.php'; ?>
 </body>
 </html>

@@ -1,11 +1,17 @@
 <?php 
+// start session to access cart and user data
 session_start();
+
+// redirect to shop if cart is empty
 if (empty($_SESSION['cart'])) {
     header("Location: shop.php");
     exit;
 }
 
+// initialize cart total accumulator
 $cart_total = 0;
+
+// loop through cart items to calculate total order cost
 foreach ($_SESSION['cart'] as $item) {
     $cart_total += $item['price'] * $item['quantity'];
 }
@@ -21,6 +27,7 @@ $use_solid_nav = true;
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="page-with-nav">
+    <!-- include global navbar -->
     <?php include 'includes/navbar.php'; ?>
 
     <main class="blume-container">
@@ -30,16 +37,19 @@ $use_solid_nav = true;
             <!-- Shipping Form -->
             <div>
                 <h2 class="serif-font blume-form-title">Shipping Details</h2>
+                <!-- checkout form with client-side js validation on submit -->
                 <form action="process_order.php" method="POST" id="checkoutForm" onsubmit="return validateForm()">
                     
                     <div class="form-group">
                         <label>Full Name</label>
+                        <!-- pre-fill name from session if user is logged in -->
                         <input type="text" id="full_name" name="full_name" value="<?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : ''; ?>">
                         <span class="error-message" id="nameError">Please enter your full name.</span>
                     </div>
                     
                     <div class="form-group">
                         <label>Email Address</label>
+                        <!-- pre-fill email from session if logged in -->
                         <input type="email" id="email" name="email" value="<?php echo isset($_SESSION['user_email']) ? htmlspecialchars($_SESSION['user_email']) : ''; ?>">
                         <span class="error-message" id="emailError">Please enter a valid email format.</span>
                     </div>
@@ -73,6 +83,7 @@ $use_solid_nav = true;
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- loop through cart items to display order summary -->
                         <?php foreach ($_SESSION['cart'] as $item): ?>
                             <tr>
                                 <td>
@@ -94,10 +105,12 @@ $use_solid_nav = true;
         </div>
     </main>
 
+    <!-- include footer -->
     <?php include 'includes/footer.php'; ?>
 
     <!-- Client-Side JavaScript Validation -->
     <script>
+    // function to validate checkout form inputs before submission
     function validateForm() {
         let isValid = true;
         
@@ -106,30 +119,30 @@ $use_solid_nav = true;
         const phone = document.getElementById('phone').value.trim();
         const address = document.getElementById('address').value.trim();
 
-        // Reset all error messages
+        // hide all error messages initially
         document.querySelectorAll('.error-message').forEach(e => e.style.display = 'none');
 
-        // 1. Name Validation
+        // check if name is empty
         if (name === "") {
             document.getElementById('nameError').style.display = 'block';
             isValid = false;
         }
         
-        // 2. Strict Email Validation
+        // validate email format using regex
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (email === "" || !emailPattern.test(email)) {
             document.getElementById('emailError').style.display = 'block';
             isValid = false;
         }
 
-        // 3. Strict Phone Validation (exactly 8 digits)
+        // validate phone is exactly 8 digits
         const phonePattern = /^\d{8}$/;
         if (phone === "" || !phonePattern.test(phone)) {
             document.getElementById('phoneError').style.display = 'block';
             isValid = false;
         }
 
-        // 4. Address Validation
+        // check if address is empty
         if (address === "") {
             document.getElementById('addressError').style.display = 'block';
             isValid = false;
